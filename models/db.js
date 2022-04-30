@@ -5,7 +5,7 @@ const clientConfig = {
 };
 if (!process.env.DATABASE_SSL_DEV) {
     clientConfig.ssl = {
-        rejectUnauthorized: true,
+        rejectUnauthorized: false,
     };
 }
 console.log("database: " + process.env.DATABASE_URL);
