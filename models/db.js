@@ -1,13 +1,19 @@
 var { Client } = require("pg");
 
-const connectionString = process.env.DATABASE_URL;
-console.log("dataset: " + connectionString);
+const clientConfig = {
+    connectionString: process.env.DATABASE_URL,
+};
+if (!process.env.DATABASE_SSL_DEV) {
+    clientConfig.ssl = {
+        rejectUnauthorized: true,
+    };
+}
+console.log("database: " + process.env.DATABASE_URL);
+console.log("database ssl: " + clientConfig.ssl);
 
 const db = {
     query: function (q) {
-        const client = new Client({
-            connectionString,
-        });
+        const client = new Client(clientConfig);
         console.log("query:" + q.slice(0, 200));
         return client
             .connect() // connect to database
