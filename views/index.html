@@ -100,8 +100,22 @@
                             method: "POST",
                             body: formData,
                         }).then((res) => {
-                            res.text().then((filename) => {
-                                this.addImage(filename);
+                            res.text().then((timestamp) => {
+                                console.log(timestamp);
+                                // this.addImage(filename);
+                                fetch(
+                                    window.location.origin +
+                                        "/snapshot/" +
+                                        timestamp,
+                                    {
+                                        method: "GET",
+                                    }
+                                ).then((res) => {
+                                    res.json().then((image) => {
+                                        console.log(image);
+                                        this.addImage(image[0]["encode"]);
+                                    });
+                                });
                             });
                         });
                     }, "image/png");
@@ -112,19 +126,19 @@
                     fetch(window.location.origin + "/snapshot/", {
                         method: "GET",
                     }).then((res) => {
-                        res.json().then((filenames) => {
-                            console.log(filenames);
+                        res.json().then((images) => {
+                            console.log(images);
                             // create imgs
-                            filenames.forEach((filename) => {
-                                this.addImage(filename);
+                            images.forEach((image) => {
+                                this.addImage(image["encode"]);
                             });
                         });
                     });
                 },
-
-                addImage: function (filename) {
+                addImage: function (image) {
                     var img = document.createElement("img");
-                    img.src = window.location.origin + "/images/" + filename;
+                    // img.src = window.location.origin + "/images/" + filename;
+                    img.src = "data:image/png;base64," + image;
                     this.imgList.prepend(img);
                 },
             };
