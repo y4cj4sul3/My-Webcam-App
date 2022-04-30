@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+    <head> </head>
+    <body>
+        <div>
+            <h2>Camera Preview</h2>
+            <!-- <video id="video" autoplay></video> -->
+            <video id="video" autoplay hidden></video>
+            <canvas id="canvas"></canvas>
+            <input id="text" />
+            <button id="show-text-btn" onclick="{processor.updateText()}">
+                顯示文字
+            </button>
+            <button id="capture-btn" onclick="{processor.snapshot()}">
+                截圖
+            </button>
+        </div>
+        <div>
+            <h2>Snapshots</h2>
+            <div id="snapshots"></div>
+        </div>
+
+        <script>
+            // TODO: Need to ask whether have realtime sync to server
+
+            // Normally we should keep track of server side update (whenever image upload)
+            // to make the list update in realtime
+            // But constantly checking server any not be a good thing
+
+            // For not realtime update application,
+            // just fetch the photos on server in the beginning
+            // when user upload image, show on client immediately
+
+            let processor = {
+                doLoad: function () {
+                    this.video = document.getElementById("video");
+                    this.canvas = document.getElementById("canvas");
+                    this.context = this.canvas.getContext("2d");
+                    this.textInput = document.getElementById("text");
+                    this.text = "";
+                    this.imgList = document.getElementById("snapshots");
+
+                    // load images
+                    this.loadImages();
+
+                    // get camera
+                    navigator.mediaDevices
+                        .getUserMedia({ video: true })
+                        .then((stream) => {
+                            this.video.srcObject = stream;
+                        });
+
+                    video.addEventListener(
+                        "play",
+                        () => {
+                            // set canvas size
+                            this.canvas.width = this.video.videoWidth;
+                            this.canvas.height = this.video.videoHeight;
+                            // TODO: flex set font
+                            this.context.font = "100% Arial";
+
+                            this.timerCallback();
+                        },
+                        false
+                    );
+                },
+
+                timerCallback: function () {
+                    if (this.video.paused || this.video.ended) return;
+
+                    // show video
+                    this.context.drawImage(
+                        this.video,
+                        0,
+                        0,
+                        this.video.videoWidth,
+                        this.video.videoHeight
+                    );
+                    // add text
+                    this.context.fillStyle = "red";
+                    this.context.fillText(this.text, 10, 50);
+
+                    setTimeout(() => {
+                        this.timerCallback();
+                    }, 0);
+                },
+
+                updateText: function () {
+                    this.text = this.textInput.value;
+                },
+
+                snapshot: function () {
+                    // convert canvas to image file
+                    this.canvas.toBlob((blob) => {
+                        var formData = new FormData();
+                        formData.append("image", blob);
+
+                        // upload to server
+                        fetch(window.location.origin + "/snapshot/", {
+                            method: "POST",
+                            body: formData,
+                        }).then((res) => {
+                            res.text().then((filename) => {
+                                this.addImage(filename);
+                            });
+                        });
+                    }, "image/png");
+                },
+
+                loadImages: function () {
+                    // get image from server
+                    fetch(window.location.origin + "/snapshot/", {
+                        method: "GET",
+                    }).then((res) => {
+                        res.json().then((filenames) => {
+                            console.log(filenames);
+                            // create imgs
+                            filenames.forEach((filename) => {
+                                this.addImage(filename);
+                            });
+                        });
+                    });
+                },
+
+                addImage: function (filename) {
+                    var img = document.createElement("img");
+                    img.src = window.location.origin + "/images/" + filename;
+                    this.imgList.prepend(img);
+                },
+            };
+
+            document.addEventListener("DOMContentLoaded", () => {
+                processor.doLoad();
+            });
+        </script>
+    </body>
+</html>

@@ -1,0 +1,14 @@
+# Node modules
+/node_modules
+
+# Log
+npm-debug.log
+
+# MacOS
+.DS_Store
+
+# environment variables
+/*.env
+
+# data
+/public/images
