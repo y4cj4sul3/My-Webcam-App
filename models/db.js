@@ -14,7 +14,7 @@ console.log("database ssl: " + clientConfig.ssl);
 const db = {
     query: function (q) {
         const client = new Client(clientConfig);
-        console.log("query:" + q.slice(0, 200));
+        console.log("query: " + q.slice(0, 200));
         return client
             .connect() // connect to database
             .then(() => {
