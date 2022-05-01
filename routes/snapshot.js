@@ -1,9 +1,10 @@
 var express = require("express");
 var router = express.Router();
 var multer = require("multer");
-// var fs = require("fs");
-var ImageModel = require("../models/ImageModel");
 // var path = require("path");
+// var fs = require("fs");
+
+var ImageModel = require("../models/ImageModel");
 var wws = require("../socket");
 
 // var storage = multer.diskStorage({
@@ -20,11 +21,15 @@ var wws = require("../socket");
 var upload = multer();
 
 router.get("/", function (req, res, next) {
-    // TODO: add filter
-    // select, order
-    console.log("get request");
+    // filter
+    let from = req.query.from;
+    let to = req.query.to;
+    let at = req.query.at;
+    let limit = req.query.limit;
 
-    ImageModel.getAllImages().then((images) => {
+    console.log(`get request: from ${from} to ${to} at ${at} limit ${limit}`);
+
+    ImageModel.getImages(from, to, at, limit).then((images) => {
         res.json(images);
     });
 
@@ -42,7 +47,7 @@ router.get("/", function (req, res, next) {
 router.get("/:timestamp", function (req, res, next) {
     // get image at timestamp
     console.log("get request: " + req.params.timestamp);
-    ImageModel.getImage(req.params.timestamp).then((image) => {
+    ImageModel.getImages((at = req.params.timestamp)).then((image) => {
         res.json(image);
     });
 });

@@ -1,14 +1,12 @@
 let processor = {
-    doLoad: function () {
+    init: function () {
         this.video = document.getElementById("video");
         this.canvas = document.getElementById("canvas");
         this.context = this.canvas.getContext("2d");
         this.textInput = document.getElementById("text");
-        this.imgList = document.getElementById("snapshots");
+        this.captureBtn = document.getElementById("capture-btn");
+        this.captureSpin = document.getElementById("captureSpin");
         this.text = "";
-
-        // load images
-        this.loadImages();
 
         // get camera
         navigator.mediaDevices.getUserMedia({ video: true }).then((stream) => {
@@ -55,6 +53,10 @@ let processor = {
     },
 
     snapshot: function () {
+        // display
+        this.captureBtn.disabled = true;
+        this.captureSpin.style.display = "none";
+
         // convert canvas to image file
         this.canvas.toBlob((blob) => {
             var formData = new FormData();
@@ -64,55 +66,14 @@ let processor = {
             fetch(window.location.origin + "/snapshot/", {
                 method: "POST",
                 body: formData,
-            }).then((res) => {
-                res.text().then((timestamp) => {
-                    console.log(timestamp);
-                    // this.addImage(filename);
+            })
+                .catch((err) => {
+                    console.log("upload failed", err);
+                })
+                .finally(() => {
+                    this.captureBtn.disabled = false;
+                    this.captureSpin.style.display = "compact";
                 });
-            });
         }, "image/png");
     },
-
-    loadImages: function () {
-        // get image from server
-        fetch(window.location.origin + "/snapshot/", {
-            method: "GET",
-        }).then((res) => {
-            res.json().then((images) => {
-                console.log(images);
-                // create imgs
-                images.forEach((image) => {
-                    this.addImage(image["encode"]);
-                });
-            });
-        });
-    },
-    loadSingleImage: function (timestamp) {
-        fetch(window.location.origin + "/snapshot/" + timestamp, {
-            method: "GET",
-        }).then((res) => {
-            res.json().then((image) => {
-                console.log(image);
-                this.addImage(image[0]["encode"]);
-            });
-        });
-    },
-    addImage: function (image) {
-        var img = document.createElement("img");
-        // img.src = window.location.origin + "/images/" + filename;
-        img.src = "data:image/png;base64," + image;
-        this.imgList.prepend(img);
-    },
 };
-
-document.addEventListener("DOMContentLoaded", () => {
-    processor.doLoad();
-
-    // setup websocket
-    var HOST = location.origin.replace(/^http/, "ws");
-    this.ws = new WebSocket(HOST);
-    this.ws.onmessage = function (event) {
-        // add new image
-        processor.loadSingleImage(event.data);
-    };
-});

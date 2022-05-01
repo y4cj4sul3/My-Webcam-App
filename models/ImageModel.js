@@ -1,19 +1,29 @@
 var db = require("./db");
 
 ImageModel = {
-    timestamp: "",
-    img: "",
+    // getLatestTimeStamp: function () {
+    //     return db.get(
+    //         "SELECT timestamp FROM image ORDER BY timestamp DESC LIMIT 1"
+    //     );
+    // },
+    // getTimestamps: function () {
+    //     return db.get("SELECT timestamp FROM image");
+    // },
+    getImages: function (from = null, to = null, at = null, limit = null) {
+        // NOTE: in descending order, so from >= to
+        var q = "SELECT timestamp, encode(lo_get(raster), 'base64') FROM image";
+        if (from || to || at) {
+            q += " WHERE ";
+            if (from) {
+                q += "timestamp <= '" + from + "'";
+                if (to) q += " AND timestamp >= '" + to + "'";
+            } else if (to) q += "timestamp >= '" + to + "'";
+            else q += "timestamp = '" + at + "'";
+        }
+        q += " ORDER BY timestamp DESC";
+        if (limit) q += " LIMIT " + limit;
 
-    getTimestamps: function () {
-        return db.get("SELECT timestamp FROM image");
-    },
-    getAllImages: function () {
-        return db.get("SELECT encode(lo_get(raster), 'base64') FROM image");
-    },
-    getImage: function (timestamp) {
-        return db.get(
-            `SELECT encode(lo_get(raster), 'base64') FROM image WHERE timestamp='${timestamp}'`
-        );
+        return db.get(q);
     },
     uploadImage: function (timestamp, data) {
         return db.upload(
