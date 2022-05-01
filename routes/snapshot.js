@@ -4,6 +4,7 @@ var multer = require("multer");
 // var fs = require("fs");
 var ImageModel = require("../models/ImageModel");
 // var path = require("path");
+var wws = require("../socket");
 
 // var storage = multer.diskStorage({
 //     destination: function (req, file, cb) {
@@ -53,7 +54,9 @@ router.post("/", upload.single("image"), function (req, res, next) {
     console.log(timestamp);
     ImageModel.uploadImage(timestamp, req.file.buffer.toString("base64")).then(
         () => {
-            res.send(`${timestamp}`);
+            // boardcast via socket
+            wws.boardcast(`${timestamp}`);
+            res.send();
         }
     );
 });
