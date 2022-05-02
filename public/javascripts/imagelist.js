@@ -144,5 +144,7 @@ let imagelist = {
     deleteImageFromList: function (timestamp) {
         var imgDiv = document.getElementById(timestamp);
         if (imgDiv) imgDiv.remove();
+        // lazy load if current list has not enough images for it to scroll
+        if (this.list.children.length < 5) this.lazyLoad();
     },
 };
