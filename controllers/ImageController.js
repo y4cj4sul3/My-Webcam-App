@@ -57,8 +57,15 @@ const deleteImage = (req, res, next) => {
     });
 };
 
+const getTimestamps = (req, res, next) => {
+    imageModel.getTimestamps().then((timestamps) => {
+        res.json(timestamps);
+    });
+};
+
 module.exports = {
     getImages,
     addImage,
     deleteImage,
+    getTimestamps,
 };

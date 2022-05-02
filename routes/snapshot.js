@@ -22,6 +22,8 @@ var upload = multer();
 
 router.get("/", imageController.getImages);
 
+router.get("/timestamps", imageController.getTimestamps);
+
 router.get("/:timestamp", function (req, res, next) {
     // get image at timestamp
     req.query.at = req.params.timestamp;
