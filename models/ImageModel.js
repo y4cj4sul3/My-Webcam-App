@@ -1,5 +1,9 @@
 var db = require("./db");
 
+// cold start
+// create table if not exist
+db.query("CREATE TABLE IF NOT EXISTS image(timestamp char(13), raster oid)");
+
 ImageModel = {
     // getLatestTimeStamp: function () {
     //     return db.get(

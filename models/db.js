@@ -16,16 +16,10 @@ const db = {
         const client = new Client(clientConfig);
         console.log("query: " + q.slice(0, 200));
         return client
-            .connect() // connect to database
-            .then(() => {
-                // query
-                return client.query(q);
-            })
-            .then((res) => {
-                // disconnect from database
-                client.end();
-                return res;
-            });
+            .connect()
+            .then(() => client.query(q))
+            .catch((err) => console.error("DB error:", err))
+            .finally(() => client.end());
     },
     get: function (q) {
         return this.query(q).then((res) => {
