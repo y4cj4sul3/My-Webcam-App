@@ -1,9 +1,14 @@
 function connect() {
     var ws = new WebSocket(location.origin.replace(/^http/, "ws"));
     ws.onmessage = function (e) {
-        // e.data: latest timestamp
-        // load lastest images
-        imagelist.loadLatest();
+        const cmd = e.data.charAt(0);
+        if (cmd === "n") {
+            // load lastest images
+            imagelist.loadLatest();
+        } else if (cmd === "d") {
+            // delete image
+            imagelist.deleteImageFromList(e.data.substring(1));
+        }
     };
     ws.onopen = function (e) {
         console.log("Socket is connected");

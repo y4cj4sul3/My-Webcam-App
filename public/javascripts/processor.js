@@ -55,7 +55,7 @@ let processor = {
     snapshot: function () {
         // update display
         this.captureBtn.disabled = true;
-        this.captureSpin.style.display = "compact";
+        this.captureSpin.style.display = "inline-flex";
 
         // convert canvas to image file
         this.canvas.toBlob((blob) => {

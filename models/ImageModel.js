@@ -36,6 +36,29 @@ ImageModel = {
             `INSERT INTO image(timestamp, raster) VALUES ('${timestamp}', lo_from_bytea(0, decode('${data}', 'base64')))`
         );
     },
+    deleteImage: function (timestamp) {
+        return db
+            .get(`SELECT raster FROM image WHERE timestamp='${timestamp}'`)
+            .then((res) => {
+                // get image oid
+                if (res.length == 0) {
+                    console.log(`image at ${timestamp} not exist`);
+                    return false;
+                }
+                var img_oid = res[0]["raster"];
+                console.log("image oid: " + img_oid);
+
+                // remove image and the row from table
+                return db
+                    .query(
+                        `DELETE FROM image WHERE timestamp='${timestamp}'; SELECT lo_unlink('${img_oid}')`
+                    )
+                    .then(() => {
+                        console.log(`image at ${timestamp} is deleted`);
+                        return true;
+                    });
+            });
+    },
 };
 
 module.exports = ImageModel;

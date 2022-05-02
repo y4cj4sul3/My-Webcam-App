@@ -30,4 +30,6 @@ router.get("/:timestamp", function (req, res, next) {
 
 router.post("/", upload.single("image"), imageController.addImage);
 
+router.delete("/:timestamp", imageController.deleteImage);
+
 module.exports = router;
