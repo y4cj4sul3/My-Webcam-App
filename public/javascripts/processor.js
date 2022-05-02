@@ -19,8 +19,8 @@ let processor = {
                 // set canvas size
                 this.canvas.width = this.video.videoWidth;
                 this.canvas.height = this.video.videoHeight;
-                // TODO: flex set font
-                this.context.font = "100% Arial";
+                // set font
+                this.context.font = `${this.canvas.height * 0.2}px Arial`;
 
                 this.timerCallback();
             },
@@ -41,7 +41,7 @@ let processor = {
         );
         // add text
         this.context.fillStyle = "red";
-        this.context.fillText(this.text, 10, 50);
+        this.context.fillText(this.text, 10, this.canvas.height * 0.95);
 
         setTimeout(() => {
             this.timerCallback();
@@ -53,9 +53,9 @@ let processor = {
     },
 
     snapshot: function () {
-        // display
+        // update display
         this.captureBtn.disabled = true;
-        this.captureSpin.style.display = "none";
+        this.captureSpin.style.display = "compact";
 
         // convert canvas to image file
         this.canvas.toBlob((blob) => {
@@ -71,8 +71,9 @@ let processor = {
                     console.log("upload failed", err);
                 })
                 .finally(() => {
+                    // update display
                     this.captureBtn.disabled = false;
-                    this.captureSpin.style.display = "compact";
+                    this.captureSpin.style.display = "none";
                 });
         }, "image/png");
     },

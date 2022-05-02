@@ -11,7 +11,6 @@ let imagelist = {
         this.lazyLoadLock = false;
         this.requestCount = 0;
 
-        // FIXME: buggy when using mobile
         // scroll to lazy load
         var snapDiv = document.getElementById("snapshots");
         snapDiv.addEventListener("scroll", () => {
